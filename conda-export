@@ -17,19 +17,16 @@ usage: conda-export [arguments]        export environment
 
 Arguments:
    -d                   Destination of the environment.yml files {default $HOME)
-   -i                   Comma sperated include list of environments
+   -i                   Comma seperated include list of environments
    -e                   Comma seperated exclude list of environments (default base)
-   -f                   Export environment with explicit version numbers, otherwise only manual installed environments
-   -v			verbose 
+   -f                   Export environment with explicit version numbers, otherwise only manual installed packages
+   -v			Verbose 
    -h                   Print this dialog
 
 Example:
    conda-export -e env1,env2 -d ~ 
 """
 	exit 0
-}
-function join_path() {
-    echo "${1:+$1/}$2" | sed 's#//#/#g'
 }
 
 function print(){	
@@ -93,3 +90,5 @@ do
 		 eval $command
 	fi
 done
+
+exit 0
