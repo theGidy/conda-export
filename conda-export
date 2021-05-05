@@ -57,14 +57,18 @@ fi
 
 IFS=',' read -ra exclude_array <<< "$exclude"
 
-if [ -z "${include+x}" ]
+print "Will serach for existing environments..."
+all_environments=$(eval "conda env list | cut -d ' ' -f1|tail -n +4")
+
+print "Installed environments: $all_environments"
+if [ ! -z "${include+x}" ]
 then
-	print "Will serach for existing environments..."
-	include_array=$(eval "conda env list | cut -d ' ' -f1|tail -n +4")
-	print "Found environments: $include_array"
-else
 	IFS=',' read -ra include_array <<< "$include"
+else
+	include_array=$all_environments
 fi
+
+
 
 print "Exclude environments: ${exclude_array[*]}"
 print "Include environments: ${include_array[*]}"
@@ -73,7 +77,7 @@ for env in ${exclude_array[@]}; do
 	env_array=( "${include_array[@]/$env}" )
 done
 
-print "Export environments:: ${env_array[*]}"
+print "Export environments: ${env_array[*]}"
 
 for env_name in ${env_array[@]} 
 do
@@ -91,4 +95,5 @@ do
 	fi
 done
 
+print "Finished with export"
 exit 0
