@@ -1,0 +1,95 @@
+#!/bin/bash
+
+
+
+# Default Values
+export_path=$HOME
+exclude="base"
+verbose=0
+help=0
+full=0
+
+function help() { 
+	echo """
+conda-export - 1.0 - 04.05.2021
+
+usage: conda-export [arguments]        export environment
+
+Arguments:
+   -d                   Destination of the environment.yml files {default $HOME)
+   -i                   Comma sperated include list of environments
+   -e                   Comma seperated exclude list of environments (default base)
+   -f                   Export environment with explicit version numbers, otherwise only manual installed environments
+   -v			verbose 
+   -h                   Print this dialog
+
+Example:
+   conda-export -e env1,env2 -d ~ 
+"""
+	exit 0
+}
+function join_path() {
+    echo "${1:+$1/}$2" | sed 's#//#/#g'
+}
+
+function print(){	
+	if [ "${verbose}" -eq 1 ]
+	then
+	        echo $1
+	fi
+
+
+}
+
+while getopts d:i:e:fhv flag
+do
+    case "${flag}" in
+        d) export_path=${OPTARG};;
+	i) include=${OPTARG};;
+	e) exclude=${OPTARG};;
+	f) full=1;;
+	h) help=1;;
+	v) verbose=1;
+    esac
+done
+
+if [ "${help}" -eq 1 ] 
+then
+	help
+fi
+
+IFS=',' read -ra exclude_array <<< "$exclude"
+
+if [ -z "${include+x}" ]
+then
+	print "Will serach for existing environments..."
+	include_array=$(eval "conda env list | cut -d ' ' -f1|tail -n +4")
+	print "Found environments: $include_array"
+else
+	IFS=',' read -ra include_array <<< "$include"
+fi
+
+print "Exclude environments: ${exclude_array[*]}"
+print "Include environments: ${include_array[*]}"
+
+for env in ${exclude_array[@]}; do
+	env_array=( "${include_array[@]/$env}" )
+done
+
+print "Export environments:: ${env_array[*]}"
+
+for env_name in ${env_array[@]} 
+do
+	if [ "$env_name" != "#" ]
+	then
+		 destination="$(realpath ${export_path})/${env_name}.yml"
+		 print "Export $env_name to ${destination}"
+		 if [ "$full" = 1 ]
+		 then 
+		 	command="conda env export -n $env_name > $destination"
+		 else
+		 	command="conda env export -n $env_name --from-history > $destination"
+		 fi
+		 eval $command
+	fi
+done
