@@ -1,6 +1,5 @@
 # conda-export
-Smple bash script to export every environment defined by conda to a yml file. 
-
+Simple shell script to mass export the environments of users defined by conda to a yml files. Is used in a migration/automatiation process to backup every environment a user created.
 
 
 # Usage Examples 
