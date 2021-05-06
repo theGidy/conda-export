@@ -7,7 +7,7 @@ export_path=$HOME
 exclude="base"
 verbose=0
 help=0
-full=0
+conda_arguments=""
 
 function help() { 
 	echo """
@@ -22,6 +22,12 @@ Arguments:
    -f                   Export environment with explicit version numbers, otherwise only manual installed packages
    -v			Verbose 
    -h                   Print this dialog
+
+Conda export Arguments: 
+ 
+   -n         		Remove build specification from dependencies [conda export --no-builds ]
+   -c			Do not include channel names with package names. [conda export --ignore-channels ]
+   -f		        Build environment spec from explicit specs in history [conda export --from-history ]
 
 Example:
    conda-export -e env1,env2 -d ~ 
@@ -38,13 +44,15 @@ function print(){
 
 }
 
-while getopts d:i:e:fhv flag
+while getopts d:i:e:fhvcnof flag
 do
     case "${flag}" in
         d) export_path=${OPTARG};;
 	i) include=${OPTARG};;
 	e) exclude=${OPTARG};;
-	f) full=1;;
+	f) conda_arguments=$conda_arguments" --from-history";;
+	c) conda_arguments=$conda_arguments" --ignore-channels";;
+	n) conda_arguments=$conda_arguments" --no-builds";;
 	h) help=1;;
 	v) verbose=1;
     esac
@@ -85,15 +93,10 @@ do
 	then
 		 destination="$(realpath ${export_path})/${env_name}.yml"
 		 print "Export $env_name to ${destination}"
-		 if [ "$full" = 1 ]
-		 then 
-		 	command="conda env export -n $env_name > $destination"
-		 else
-		 	command="conda env export -n $env_name --from-history > $destination"
-		 fi
+		 command="conda env export -n $env_name $conda_arguments > $destination"
 		 eval $command
 	fi
 done
 
-print "Finished with export"
+print "FINISHED"
 exit 0
