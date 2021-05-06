@@ -23,11 +23,10 @@ Arguments:
    -v			Verbose 
    -h                   Print this dialog
 
-Conda export Arguments: 
- 
-   -n         		Remove build specification from dependencies [conda export --no-builds ]
-   -c			Do not include channel names with package names. [conda export --ignore-channels ]
-   -f		        Build environment spec from explicit specs in history [conda export --from-history ]
+Conda export arguments: 
+   -n         		Remove build specification from dependencies [conda export --no-builds]
+   -c			Do not include channel names with package names. [conda export --ignore-channels]
+   -f		        Build environment spec from explicit specs in history [conda export --from-history]
 
 Example:
    conda-export -e env1,env2 -d ~ 
@@ -40,11 +39,9 @@ function print(){
 	then
 	        echo $1
 	fi
-
-
 }
 
-while getopts d:i:e:fhvcnof flag
+while getopts d:i:e:fhvcn flag
 do
     case "${flag}" in
         d) export_path=${OPTARG};;
